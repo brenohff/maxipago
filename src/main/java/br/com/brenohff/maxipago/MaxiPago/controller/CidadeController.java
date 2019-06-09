@@ -1,7 +1,7 @@
 package br.com.brenohff.maxipago.MaxiPago.controller;
 
-import br.com.brenohff.maxipago.MaxiPago.entity.CityEntity;
-import br.com.brenohff.maxipago.MaxiPago.entity.DistanceEntity;
+import br.com.brenohff.maxipago.MaxiPago.entity.CidadeEntity;
+import br.com.brenohff.maxipago.MaxiPago.entity.DistanciaEntity;
 import br.com.brenohff.maxipago.MaxiPago.service.CidadeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,8 +22,8 @@ public class CidadeController {
     @Autowired
     private CidadeService cidadeService;
 
-    @GetMapping(value = "buscarTodasCidades", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public List<CityEntity> buscarTodasCidades() {
+    @GetMapping(value = "buscarTodasCidades", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<CidadeEntity> buscarTodasCidades() {
         return cidadeService.buscarTodasCidades();
     }
 
@@ -37,7 +37,7 @@ public class CidadeController {
             httpHeaders.setContentType(MediaType.APPLICATION_XML);
         }
 
-        List<DistanceEntity> distanceList = cidadeService.obterCombinacoes(unidade);
+        List<DistanciaEntity> distanceList = cidadeService.obterCombinacoes(unidade);
 
         return ResponseEntity.status(HttpStatus.OK).headers(httpHeaders).body(distanceList);
     }

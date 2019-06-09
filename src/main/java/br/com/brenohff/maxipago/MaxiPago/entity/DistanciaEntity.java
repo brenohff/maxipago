@@ -2,7 +2,7 @@ package br.com.brenohff.maxipago.MaxiPago.entity;
 
 import java.io.Serializable;
 
-public class DistanceEntity implements Serializable {
+public class DistanciaEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String initialCity;

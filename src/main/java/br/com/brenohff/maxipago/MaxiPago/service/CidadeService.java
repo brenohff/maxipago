@@ -1,8 +1,9 @@
 package br.com.brenohff.maxipago.MaxiPago.service;
 
-import br.com.brenohff.maxipago.MaxiPago.dao.CityDAO;
-import br.com.brenohff.maxipago.MaxiPago.entity.CityEntity;
-import br.com.brenohff.maxipago.MaxiPago.entity.DistanceEntity;
+import br.com.brenohff.maxipago.MaxiPago.dao.CidadeDAO;
+import br.com.brenohff.maxipago.MaxiPago.entity.CidadeEntity;
+import br.com.brenohff.maxipago.MaxiPago.entity.DistanciaEntity;
+import br.com.brenohff.maxipago.MaxiPago.exception.CidadeNaoEncontrada;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,13 +15,18 @@ import java.util.List;
 @Service
 public class CidadeService {
 
-    private CityDAO cityDAO = new CityDAO();
+    private CidadeDAO cidadeDAO = new CidadeDAO();
 
-    public List<CityEntity> buscarTodasCidades() {
-        List<CityEntity> citiesList = new ArrayList<>();
+    /**
+     * Obtem todas as cidades cadastradas no banco de dados
+     *
+     * @return Retornará uma lista de cidades
+     */
+    public List<CidadeEntity> buscarTodasCidades() {
+        List<CidadeEntity> citiesList = new ArrayList<>();
 
         try {
-            citiesList = cityDAO.getAllCities();
+            citiesList = cidadeDAO.obterTodasCidades();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -28,39 +34,67 @@ public class CidadeService {
         return citiesList;
     }
 
-    public List<DistanceEntity> obterCombinacoes(String unidade) {
-        List<CityEntity> citiesList = buscarTodasCidades();
+    /**
+     * Método utilizado para obter as combinações entre as cidades
+     *
+     * @param unidade Unidade de medida (MI ou KM)
+     * @return Retornará uma lista de distancias combinadas
+     */
+    public List<DistanciaEntity> obterCombinacoes(String unidade) {
+        List<CidadeEntity> cidadesList = buscarTodasCidades();
 
-        return combineCities(citiesList, new ArrayList<>(), unidade);
-    }
-
-    private List<DistanceEntity> combineCities(final List<CityEntity> citiesList, List<DistanceEntity> distList, final String unitType) {
-        CityEntity actualCity = citiesList.get(0);
-
-        for (int i = 1; i < citiesList.size(); i++) {
-            DistanceEntity distanceEntity = new DistanceEntity();
-
-            distanceEntity.setInitialCity(actualCity.getName());
-            distanceEntity.setFinalCity(citiesList.get(i).getName());
-            distanceEntity.setUnit(unitType.toUpperCase());
-            distanceEntity.setDistance(calculateDistanceBetweenCities(actualCity, citiesList.get(i), unitType));
-
-            distList.add(distanceEntity);
+        if(cidadesList.size() < 3){
+            throw new CidadeNaoEncontrada("É necessario ao menos 3 cidades cadastradas para fazer combinação");
         }
 
+        return combinarCidades(cidadesList, new ArrayList<>(), unidade);
+    }
+
+    /**
+     * Método para realizar as combinações das cidades utilizando recursividade.
+     *
+     * @param citiesList Lista inicial das cidades
+     * @param distList   Lista de distâncias já iniciada
+     * @param unitType   Unidade de medida (MI ou KM)
+     * @return Irá retornar uma lista de distâncias
+     */
+    private List<DistanciaEntity> combinarCidades(final List<CidadeEntity> citiesList, List<DistanciaEntity> distList, final String unitType) {
+        CidadeEntity actualCity = citiesList.get(0);
+
+        for (int i = 1; i < citiesList.size(); i++) {
+            DistanciaEntity distanciaEntity = new DistanciaEntity();
+
+            distanciaEntity.setInitialCity(actualCity.getName());
+            distanciaEntity.setFinalCity(citiesList.get(i).getName());
+            distanciaEntity.setUnit(unitType.toUpperCase());
+            distanciaEntity.setDistance(calculateDistanceBetweenCities(actualCity, citiesList.get(i), unitType));
+
+            distList.add(distanciaEntity);
+        }
+
+        //Se a sublista tiver tamanho 1, ela não precisa mais ser combinada.
         if (citiesList.subList(1, citiesList.size()).size() != 1) {
-            combineCities(citiesList.subList(1, citiesList.size()), distList, unitType);
+            combinarCidades(citiesList.subList(1, citiesList.size()), distList, unitType);
         }
 
         return distList;
 
     }
 
-    private double calculateDistanceBetweenCities(final CityEntity city1, final CityEntity city2, final String unit) {
-        double theta = city1.getLongitude() - city2.getLongitude();
+    /**
+     * O método utilizado abaixo foi retirado do site https://www.geodatasource.com/developers/java pois o mesmo já é utilizado
+     * em todos os produtos da empresa GEODATASOURCE, logo é confiavel e de fácil implementação
+     *
+     * @param cidade1 Cidade 1
+     * @param cidade2 Cidade 2
+     * @param unidade  Unidade de medida (MI ou KM)
+     * @return Irá retornar um double com a distância entre as 2 cidades
+     */
+    private double calculateDistanceBetweenCities(final CidadeEntity cidade1, final CidadeEntity cidade2, final String unidade) {
+        double theta = cidade1.getLongitude() - cidade2.getLongitude();
 
-        double lat1 = city1.getLatitude();
-        double lat2 = city2.getLatitude();
+        double lat1 = cidade1.getLatitude();
+        double lat2 = cidade2.getLatitude();
 
         double dist = Math.sin(Math.toRadians(lat1)) * Math.sin(Math.toRadians(lat2))
                 + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.cos(Math.toRadians(theta));
@@ -69,7 +103,7 @@ public class CidadeService {
         dist = Math.toDegrees(dist);
         dist = dist * 60 * 1.1515;
 
-        if (unit.equalsIgnoreCase("KM")) {
+        if (unidade.equalsIgnoreCase("KM")) {
             dist = dist * 1.609344;
         }
 

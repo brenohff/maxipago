@@ -1,6 +1,6 @@
 package br.com.brenohff.maxipago.MaxiPago.dao;
 
-import br.com.brenohff.maxipago.MaxiPago.entity.CityEntity;
+import br.com.brenohff.maxipago.MaxiPago.entity.CidadeEntity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,13 +9,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CityDAO extends DataBaseDAO {
+public class CidadeDAO extends DataBaseDAO {
 
-    public List<CityEntity> getAllCities() throws SQLException {
+    public List<CidadeEntity> obterTodasCidades() throws SQLException {
 
         Connection connection = null;
         PreparedStatement statement = null;
-        List<CityEntity> citiesList = new ArrayList<>();
+        List<CidadeEntity> cidadesList = new ArrayList<>();
 
         try {
             connection = getConnection();
@@ -24,13 +24,13 @@ public class CityDAO extends DataBaseDAO {
             ResultSet queryResult = statement.executeQuery();
 
             while (queryResult.next()) {
-                CityEntity city = new CityEntity();
-                city.setId(queryResult.getInt("id"));
-                city.setName(queryResult.getString("name"));
-                city.setLatitude(queryResult.getDouble("latitude"));
-                city.setLongitude(queryResult.getDouble("longitude"));
+                CidadeEntity cidade = new CidadeEntity();
+                cidade.setId(queryResult.getInt("id"));
+                cidade.setName(queryResult.getString("name"));
+                cidade.setLatitude(queryResult.getDouble("latitude"));
+                cidade.setLongitude(queryResult.getDouble("longitude"));
 
-                citiesList.add(city);
+                cidadesList.add(cidade);
 
             }
 
@@ -47,7 +47,7 @@ public class CityDAO extends DataBaseDAO {
             }
         }
 
-        return citiesList;
+        return cidadesList;
 
     }
 }
