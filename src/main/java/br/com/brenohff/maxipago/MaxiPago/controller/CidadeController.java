@@ -22,7 +22,7 @@ public class CidadeController {
     @Autowired
     private CidadeService cidadeService;
 
-    @GetMapping(value = "buscarTodasCidades", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "buscarTodas", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CidadeEntity> buscarTodasCidades() {
         return cidadeService.buscarTodasCidades();
     }

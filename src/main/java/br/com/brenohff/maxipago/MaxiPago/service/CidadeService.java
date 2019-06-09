@@ -43,7 +43,7 @@ public class CidadeService {
     public List<DistanciaEntity> obterCombinacoes(String unidade) {
         List<CidadeEntity> cidadesList = buscarTodasCidades();
 
-        if(cidadesList.size() < 3){
+        if (cidadesList.size() < 3) {
             throw new CidadeNaoEncontrada("É necessario ao menos 3 cidades cadastradas para fazer combinação");
         }
 
@@ -87,7 +87,7 @@ public class CidadeService {
      *
      * @param cidade1 Cidade 1
      * @param cidade2 Cidade 2
-     * @param unidade  Unidade de medida (MI ou KM)
+     * @param unidade Unidade de medida (MI ou KM)
      * @return Irá retornar um double com a distância entre as 2 cidades
      */
     private double calculateDistanceBetweenCities(final CidadeEntity cidade1, final CidadeEntity cidade2, final String unidade) {
